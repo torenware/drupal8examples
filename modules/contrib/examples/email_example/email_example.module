@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function foobar_menu() {
+  $items['/examples/email_example'] = array(
+		'title' => 'Email Example',
+		'description' => 'Callback for generating form.',
+		'route_name' => 'email_example.drupal_get_form',
+	);
+  return $items;
+}
