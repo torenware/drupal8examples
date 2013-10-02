@@ -1,0 +1,6 @@
+name: Email Example
+type: module
+description: An example module that send a simple email message
+package: Custom
+version: 8.x-1.0
+core: 8.x
