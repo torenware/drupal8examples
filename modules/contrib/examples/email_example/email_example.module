@@ -3,11 +3,12 @@
 /**
  * Implements hook_menu().
  */
-function foobar_menu() {
+function email_example_menu() {
   $items['/examples/email_example'] = array(
-		'title' => 'Email Example',
+		'title' => 'Email Example: contact form',
 		'description' => 'Callback for generating form.',
-		'route_name' => 'email_example.drupal_get_form',
+		'route_name' => 'email_example',
+    'type' => MENU_NORMAL_ITEM, // Default.
 	);
   return $items;
 }

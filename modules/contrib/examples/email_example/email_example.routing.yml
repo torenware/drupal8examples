@@ -1,6 +1,7 @@
-email_example.drupal_get_form:
+email_example:
+  path: '/examples/email_example'
   pattern: '/examples/email_example'
   defaults:
-    _form: '\Drupal\email_example\Controller\EmailExampleController::EmailExampleGetFormPage'
+    _form: '\Drupal\email_example\Form\EmailExampleGetFormPage'
   requirements:
-    _access: 'TRUE'
+    _permission: 'access content'
