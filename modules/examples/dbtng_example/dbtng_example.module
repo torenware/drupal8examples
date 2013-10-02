@@ -2,7 +2,7 @@
 /**
  * @file
  * This is an example outlining how a module can make use of the new DBTNG
- * database API in Drupal 7.
+ * database API.
  *
  * @todo Demonstrate transaction usage.
  *
@@ -24,15 +24,6 @@
  * at @link http://drupal.org/node/310069 Database API @endlink.
  *
  * The several examples here demonstrate basic database usage.
- *
- * In Drupal 6, the recommended method to save or update an entry in the
- * database was drupal_write_record() or db_query().
- *
- * In Drupal 7 and forward, the usage of db_query()
- * for INSERT, UPDATE, or DELETE is deprecated, because it is
- * database-dependent. Instead specific functions are provided to perform these
- * operations: db_insert(), db_update(), and db_delete() do the job now.
- * (Note that drupal_write_record() is also deprecated.)
  *
  * db_insert() example:
  * @code
@@ -64,23 +55,12 @@
  * @see db_update()
  * @see db_delete()
  * @see drupal_write_record()
-*/
+ */
 
 /**
  * Save an entry in the database.
  *
  * The underlying DBTNG function is db_insert().
- *
- * In Drupal 6, this would have been:
- * @code
- *   db_query(
- *     "INSERT INTO {dbtng_example} (name, surname, age)
- *       VALUES ('%s', '%s', '%d')",
- *     $entry['name'],
- *     $entry['surname'],
- *     $entry['age']
- *   );
- * @endcode
  *
  * Exception handling is shown in this example. It could be simplified
  * without the try/catch blocks, but since an insert will throw an exception
@@ -109,20 +89,6 @@ function dbtng_example_entry_insert($entry) {
 /**
  * Update an entry in the database.
  *
- * The former, deprecated techniques used db_query() or drupal_write_record():
- * @code
- *  drupal_write_record('dbtng_example', $entry, $entry['pid']);
- * @endcode
- *
- * @code
- *  db_query(
- *    "UPDATE {dbtng_example}
- *     SET name = '%s', surname = '%s', age = '%d'
- *     WHERE pid = %d",
- *     $entry['pid']
- *  );
- * @endcode
- *
  * @param $entry
  *   An array containing all the fields of the item to be updated.
  *
@@ -146,12 +112,6 @@ function dbtng_example_entry_update($entry) {
 /**
  * Delete an entry from the database.
  *
- * The usage of db_query is deprecated except for static queries.
- * Formerly, a deletion might have been accomplished like this:
- * @code
- *  db_query("DELETE FROM {dbtng_example} WHERE pid = %d", $entry['pid]);
- * @endcode
- *
  * @param $entry
  *   An array containing at least the person identifier 'pid' element of the
  *   entry to delete.
@@ -162,29 +122,21 @@ function dbtng_example_entry_delete($entry) {
   db_delete('dbtng_example')
     ->condition('pid', $entry['pid'])
     ->execute();
-
 }
-
 
 /**
  * Read from the database using a filter array.
  *
- * In Drupal 6, the standard function to perform reads was db_query(), and
- * for static queries, it still is.
+ * The standard function to perform reads was db_query(), and for static
+ * queries, it still is.
  *
  * db_query() used an SQL query with placeholders and arguments as parameters.
  *
- * @code
- *  // Old way
- *  $query = "SELECT * FROM {dbtng_example} n WHERE n.uid = %d AND name = '%s'";
- *  $result = db_query($query, $uid, $name);
- * @endcode
- *
- * Drupal 7 DBTNG provides an abstracted interface that will work with a wide
+ * Drupal DBTNG provides an abstracted interface that will work with a wide
  * variety of database engines.
  *
  * db_query() is deprecated except when doing a static query. The following is
- * perfectly acceptable in Drupal 7. See
+ * perfectly acceptable in Drupal 8. See
  * @link http://drupal.org/node/310072 the handbook page on static queries @endlink
  *
  * @code
@@ -312,7 +264,7 @@ function dbtng_example_advanced_list() {
     }
     // Make a table for them.
     $header = array(t('Id'), t('Created by'), t('Name'), t('Surname'), t('Age'));
-    $output .= theme('table', array('header' => $header, 'rows' => $rows));
+    $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'dbtng-example-advanced-list')));
   }
   else {
     drupal_set_message(t('No entries meet the filter criteria (Name = "John" and Age > 18).'));
@@ -452,18 +404,18 @@ function dbtng_example_form_add($form, &$form_state) {
  * Submit handler for 'add entry' form.
  */
 function dbtng_example_form_add_submit($form, &$form_state) {
-  global $user;
+  $account = \Drupal::request()->attributes->get('_account');
 
   // Save the submitted entry.
   $entry = array(
     'name'    => $form_state['values']['name'],
     'surname' => $form_state['values']['surname'],
     'age'     => $form_state['values']['age'],
-    'uid'     => $user->uid,
+    'uid'     => $account->id(),
   );
   $return = dbtng_example_entry_insert($entry);
   if ($return) {
-    drupal_set_message(t("Created entry @entry", array('@entry' => print_r($entry, TRUE))));
+    drupal_set_message(t('Created entry @entry', array('@entry' => print_r($entry, TRUE))));
   }
 }
 
@@ -480,13 +432,13 @@ function dbtng_example_form_update($form, &$form_state) {
   $keyed_entries = array();
   if (empty($entries)) {
     $form['no_values'] = array(
-      '#value' => t("No entries exist in the table dbtng_example table."),
+      '#value' => t('No entries exist in the table dbtng_example table.'),
     );
     return $form;
   }
 
   foreach ($entries as $entry) {
-    $options[$entry->pid] = t("@pid: @name @surname (@age)", array('@pid' => $entry->pid, '@name' => $entry->name, '@surname' => $entry->surname, '@age' => $entry->age));
+    $options[$entry->pid] = t('@pid: @name @surname (@age)', array('@pid' => $entry->pid, '@name' => $entry->name, '@surname' => $entry->surname, '@age' => $entry->age));
     $keyed_entries[$entry->pid] = $entry;
   }
   $default_entry = !empty($form_state['values']['pid']) ? $keyed_entries[$form_state['values']['pid']] : $entries[0];
@@ -522,7 +474,7 @@ function dbtng_example_form_update($form, &$form_state) {
     '#title' => t('Updated age'),
     '#size' => 4,
     '#default_value' => $default_entry->age,
-    '#description' => t("Values greater than 127 will cause an exception"),
+    '#description' => t('Values greater than 127 will cause an exception'),
   );
 
   $form['submit'] = array(
@@ -552,7 +504,7 @@ function dbtng_example_form_update_callback($form, $form_state) {
  * Submit handler for 'update entry' form.
  */
 function dbtng_example_form_update_submit($form, &$form_state) {
-  global $user;
+  $account = \Drupal::request()->attributes->get('_account');
 
   // Save the submitted entry.
   $entry = array(
@@ -560,10 +512,10 @@ function dbtng_example_form_update_submit($form, &$form_state) {
     'name' => $form_state['values']['name'],
     'surname' => $form_state['values']['surname'],
     'age' => $form_state['values']['age'],
-    'uid' => $user->uid,
+    'uid' => $account->id(),
   );
   $count = dbtng_example_entry_update($entry);
-  drupal_set_message(t("Updated entry @entry (@count row updated)", array('@count' => $count, '@entry' => print_r($entry, TRUE))));
+  drupal_set_message(t('Updated entry @entry (@count row updated)', array('@count' => $count, '@entry' => print_r($entry, TRUE))));
 }
 /**
  * @} End of "defgroup dbtng_example".

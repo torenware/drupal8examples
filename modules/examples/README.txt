@@ -29,4 +29,3 @@ If you find a problem, incorrect comment, obsolete or improper code or such,
 please let us know by creating a new issue at
 http://drupal.org/project/issues/examples
 
-

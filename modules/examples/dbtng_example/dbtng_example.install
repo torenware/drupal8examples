@@ -7,9 +7,6 @@
 /**
  * Implements hook_install().
  *
- * In Drupal 7, there is no need to install schema using this hook, the schema
- * is already installed before this hook is called.
- *
  * We will create a default entry in the database.
  *
  * @see hook_install()
@@ -40,20 +37,16 @@ function dbtng_example_install() {
   db_insert('dbtng_example')
     ->fields($fields)
     ->execute();
-
 }
 
 /**
  * Implements hook_uninstall().
  *
- * As in hook_install, there is no need to uninstall schema, Drupal will do it
- * for us.
- *
  * @see hook_uninstall()
  * @ingroup dbtng_example
  */
 function dbtng_example_uninstall() {
-  // nothing.
+  // Nothing.
 }
 
 
@@ -68,7 +61,6 @@ function dbtng_example_uninstall() {
  * @ingroup dbtng_example
  */
 function dbtng_example_schema() {
-
   $schema['dbtng_example'] = array(
     'description' => 'Stores example person entries for demonstration purposes.',
     'fields' => array(

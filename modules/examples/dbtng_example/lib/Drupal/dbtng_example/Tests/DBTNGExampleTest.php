@@ -4,10 +4,14 @@
  * SimpleTests for dbtng_example module.
  */
 
+namespace Drupal\dbtng_example\Tests;
+use Drupal\simpletest\WebTestBase;
+
 /**
  * Default test case for the dbtng_example module.
  */
-class DBTNGExampleUnitTestCase extends DrupalWebTestCase {
+class DBTNGExampleTest extends WebTestBase {
+  public static $modules = array('dbtng_example');
 
   public static function getInfo() {
     return array(
@@ -15,10 +19,6 @@ class DBTNGExampleUnitTestCase extends DrupalWebTestCase {
       'description' => 'Various unit tests on the dbtng example module.' ,
       'group' => 'Examples',
     );
-  }
-
-  function setUp() {
-    parent::setUp('dbtng_example');
   }
 
   /**
@@ -44,7 +44,7 @@ class DBTNGExampleUnitTestCase extends DrupalWebTestCase {
 
     //Test the add tab.
     // Add the new entry.
-    $this->drupalPost('examples/dbtng/add',
+    $this->drupalPostForm('examples/dbtng/add',
       array('name'  => 'Some', 'surname' => 'Anonymous', 'age' => 33), t('Add'));
     // Now find the new entry.
     $this->drupalGet('examples/dbtng');
@@ -63,7 +63,7 @@ class DBTNGExampleUnitTestCase extends DrupalWebTestCase {
     $entry = $result[0];
     unset($entry->uid);
     $entry->name = 'NewFirstName';
-    $this->drupalPost('examples/dbtng/update',
+    $this->drupalPostForm('examples/dbtng/update',
       (array)$entry, t('Update'));
     // Now find the new entry.
     $this->drupalGet('examples/dbtng');
@@ -71,9 +71,9 @@ class DBTNGExampleUnitTestCase extends DrupalWebTestCase {
 
     // Try the advanced tab.
     $this->drupalGet('examples/dbtng/advanced');
-    $rows = $this->xpath("//*[@id='block-system-main']/div/table[1]/tbody/tr");
-    $this->assertEqual(count($rows), 1, "One row found in advanced view");
-    $this->assertFieldByXPath("//*[@id='block-system-main']/div/table[1]/tbody/tr/td[4]", "Roe", "Name 'Roe' Exists in advanced list");
+    $rows = $this->xpath("//*[@id='dbtng-example-advanced-list'][1]/tbody/tr");
+    $this->assertEqual(count($rows), 1, 'One row found in advanced view');
+    $this->assertFieldByXPath("//*[@id='dbtng-example-advanced-list'][1]/tbody/tr/td[4]", "Roe", "Name 'Roe' Exists in advanced list");
   }
 
   /**
